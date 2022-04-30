@@ -1,0 +1,26 @@
+/* 
+  Localizable.strings
+  weconverter
+
+  Created by Álvaro LDG on 29/04/22.
+  
+*/
+
+// MARK: - WeConverter
+"weconverter.title" = "We Convert";
+"weconverter.section.1" = "What do you want to convert?";
+
+// MARK: - Conversion
+"conversion.temperature" = "Temp.";
+"conversion.length" = "Length";
+"conversion.time" = "Time";
+"conversion.volumen" = "Volume";
+
+// MARK: - Converter
+"converter.from" = "From:";
+"converter.to" = "To:";
+"converter.input" = "Value:";
+"converter.input.placeholder" = "0.0";
+"converter.result" = "Result:";
+"converter.done" = "Done";
+
