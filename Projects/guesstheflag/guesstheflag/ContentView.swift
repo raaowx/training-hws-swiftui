@@ -8,64 +8,117 @@
 import SwiftUI
 
 struct ContentView: View {
-  @State private var showingAlert = false
+    @State private var showingScore = false
+    @State private var scoreTitle = ""
+    @State private var scoreAmount = 0
 
-  var body: some View {
-    ZStack {
-      RadialGradient(
-        colors: [.black, .cyan],
-        center: .center,
-        startRadius: 20,
-        endRadius: 500)
-      VStack(spacing: 20) {
-        ForEach(0..<3) { i in
-          HStack(spacing: 20) {
-            ForEach(0..<3) { j in
-              ZStack {
-                AngularGradient(
-                  colors: [.cyan, .mint, .cyan],
-                  center: .center)
-                .frame(width: 90, height: 90)
-                Button {
-                  showingAlert.toggle()
-                } label: {
-                  HStack {
-                    Text("\(i)")
-                    Image(systemName: "x.circle.fill")
-                    Text("\(j)")
-                  }
-                  .frame(width: 65, height: 45)
-                  .foregroundColor(.black)
-                  .background(LinearGradient(
-                    gradient: Gradient(
-                      stops: [
-                        .init(color: .orange, location: 0.11),
-                        .init(color: .yellow, location: 0.44),
-                        .init(color: .orange, location: 0.88)
-                      ]),
-                    startPoint: .top,
-                    endPoint: .bottom))
-                }
-                .alert("My Alert", isPresented: $showingAlert) {
-                  Button("Ok!") { }
-                  Button("Cancel", role: .cancel) { }
-                  Button("Destroy!", role: .destructive) { }
-                } message: {
-                  Text("Did you read me?")
-                }
+    @State private var countries = [
+        "Estonia",
+        "France",
+        "Germany",
+        "Ireland",
+        "Italy",
+        "Nigeria",
+        "Poland",
+        "Russia",
+        "Spain",
+        "UK",
+        "US"
+    ].shuffled()
+    @State private var correctAnswer = Int.random(in: 0...2)
 
-              }
+
+    var body: some View {
+        ZStack {
+            RadialGradient(
+                stops: [
+                    .init(color: Color(red: 0.1, green: 0.2, blue: 0.45), location: 0.3),
+                    .init(color: Color(red: 0.76, green: 0.15, blue: 0.26), location: 0.3)
+                ],
+                center: .top,
+                startRadius: 75,
+                endRadius: 675)
+            .ignoresSafeArea()
+
+            RadialGradient(
+                stops: [
+                    .init(color: Color(red: 0.1, green: 0.2, blue: 0.45), location: 0.3),
+                    .init(color: Color(red: 0, green: 0, blue: 0, opacity: 0), location: 0.3)
+                ],
+                center: .bottom,
+                startRadius: 75,
+                endRadius: 675)
+            .ignoresSafeArea()
+
+            VStack {
+                Text("Guess the Flag")
+                    .font(.largeTitle.bold())
+                    .foregroundColor(.white)
+
+                Spacer()
+
+                VStack(spacing: 15) {
+                    VStack {
+                        Text("Tap the flag of")
+                            .foregroundStyle(.secondary)
+                            .font(.subheadline.weight(.heavy))
+
+                        Text(countries[correctAnswer])
+                            .font(.largeTitle.weight(.semibold).italic())
+                    }
+
+                    ForEach(0..<3) { number in
+                        Button {
+                            flagTapped(number)
+                        } label: {
+                            Image(countries[number])
+                                .renderingMode(.original)
+                                .clipShape(Capsule())
+                                .shadow(radius: 5)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(.regularMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+
+                Spacer()
+
+                Text("Score: \(scoreAmount)")
+                    .foregroundColor(.white)
+                    .font(.title.bold())
+
             }
-          }
+            .padding(30)
+
         }
-      }
+        .alert(scoreTitle, isPresented: $showingScore) {
+            Button("Continue", action: askQuestion)
+        } message: {
+            Text("Your score is \(scoreAmount)")
+        }
     }
-    .ignoresSafeArea()
-  }
+
+    func flagTapped(_ number: Int) {
+        if number == correctAnswer {
+            scoreTitle = "Correct"
+            scoreAmount += 1
+        } else {
+            scoreTitle = "Wrong"
+            scoreAmount = 0
+        }
+        showingScore = true
+    }
+
+    func askQuestion() {
+        countries.shuffle()
+        correctAnswer = Int.random(in: 0...2)
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
-  static var previews: some View {
-    ContentView()
-  }
+    static var previews: some View {
+        ContentView()
+    }
 }
