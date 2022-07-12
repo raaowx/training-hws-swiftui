@@ -8,25 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var showingScore = false
-    @State private var scoreTitle = ""
-    @State private var scoreAmount = 0
-
-    @State private var countries = [
-        "Estonia",
-        "France",
-        "Germany",
-        "Ireland",
-        "Italy",
-        "Nigeria",
-        "Poland",
-        "Russia",
-        "Spain",
-        "UK",
-        "US"
-    ].shuffled()
+    @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
 
+    @State private var scoreTitle = ""
+    @State private var scoreAmount = 0
+    @State private var remainingQuestions = 8
+
+    @State private var showingScore = false
+    @State private var showingFinal = false
 
     var body: some View {
         ZStack {
@@ -88,16 +78,21 @@ struct ContentView: View {
                 Text("Score: \(scoreAmount)")
                     .foregroundColor(.white)
                     .font(.title.bold())
-
+                Text("Remaining questions: \(remainingQuestions)")
+                    .foregroundColor(.white)
+                    .font(.title3.weight(.semibold))
             }
             .padding(30)
 
         }
-        .alert(scoreTitle, isPresented: $showingScore) {
+        .alert(scoreTitle, isPresented: $showingScore, actions: {
             Button("Continue", action: askQuestion)
-        } message: {
+        }, message: {
             Text("Your score is \(scoreAmount)")
-        }
+        })
+        .alert("Your final score is \(scoreAmount)", isPresented: $showingFinal, actions: {
+            Button("Start over!", action: reset)
+        })
     }
 
     func flagTapped(_ number: Int) {
@@ -105,15 +100,26 @@ struct ContentView: View {
             scoreTitle = "Correct"
             scoreAmount += 1
         } else {
-            scoreTitle = "Wrong"
-            scoreAmount = 0
+            // Add the name of the choosen country with some protection to avoid `indexOutOfBounds`.
+            scoreTitle = "Wrong\(countries.count > number ? "! That's the flag of \(countries[number])" : "")"
         }
+        remainingQuestions -= 1
         showingScore = true
     }
 
     func askQuestion() {
+        guard remainingQuestions > 0 else {
+            showingFinal = true
+            return
+        }
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+    }
+
+    func reset() {
+        scoreAmount = 0
+        remainingQuestions = 8
+        askQuestion()
     }
 }
 
