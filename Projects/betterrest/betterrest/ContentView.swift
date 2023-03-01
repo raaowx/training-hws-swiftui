@@ -10,11 +10,39 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var wakeUp = Self.defaultWakeUp
-    @State private var sleepAmount = 8.0
-    @State private var coffeeAmount = 1
-    @State private var alertTitle = ""
-    @State private var alertMessage = ""
-    @State private var alertIsShowing = false
+    @State private var sleepAmount = 7.0
+    @State private var coffeeAmount = 3
+
+    private var sleepAmountAsTime: String {
+        var components = DateComponents()
+        components.hour = Int(sleepAmount)
+        components.minute = {
+            switch "\(sleepAmount)".split(separator: ".").last {
+                case "25": return 15
+                case "5": return 30
+                case "75": return 45
+                default: return 0
+            }
+        }()
+
+        guard let date = Calendar.current.date(from: components) else { return "\(sleepAmount)" }
+        return date.formatted(.dateTime.hour(.defaultDigits(amPM: .omitted)).minute())
+    }
+
+    private var bedtimeEstimationDate: Date? {
+        calculateBedtime()
+    }
+
+    private var bedtimeEstimationTitle: String {
+        bedtimeEstimationDate != nil ? "Your ideal betime is..." : "Error"
+    }
+
+    private var bedtimeEstimationMessage: String {
+        guard let sleepTime = bedtimeEstimationDate else {
+            return "Sorry, there was a problem calculating your bedtime."
+        }
+        return sleepTime.formatted(date: .omitted, time: .shortened)
+    }
 
     private static var defaultWakeUp: Date {
         var components = DateComponents()
@@ -24,42 +52,62 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationView {
-            Form {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("When do you want to wake up?")
-                        .font(.headline)
-                    DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
-                        .labelsHidden()
+        GeometryReader { gr in
+            NavigationView {
+                VStack {
+                    Color.black
+                        .frame(width: gr.size.width - 96, height: 1)
+                        .opacity(0.2)
+
+                    Text("Welcome! We'll try to estimate your bedtime hour based in you desired wake up time and your daily coffee intake.")
+                        .font(.subheadline)
+                        .padding(16)
+                        .multilineTextAlignment(.center)
+
+                    Form {
+                        Section("Step 1: Sleep Data") {
+                            HStack {
+                                Text("When do you want to wake up?")
+                                Spacer()
+                                DatePicker("When do you want to wake up?", selection: $wakeUp, displayedComponents: .hourAndMinute)
+                                    .labelsHidden()
+                            }
+                            HStack {
+                                Text("How many hours do you want to sleep?")
+                                    .font(.callout)
+                                Spacer()
+                                VStack {
+                                    Stepper(sleepAmountAsTime, value: $sleepAmount, in: 4...12, step: 0.25)
+                                        .labelsHidden()
+                                    Text("\(sleepAmountAsTime) hours")
+                                }
+                            }
+                        }
+
+                        Section("Step 2: Coffee Intake") {
+                            Picker("How many coffees do you drink in a day?", selection: $coffeeAmount) {
+                                ForEach(1...20, id: \.self) {
+                                    Text("\($0) \($0 == 1 ? "cup" : "cups")")
+                                }
+                            }
+                        }
+                    }
+
+                    VStack(spacing: 8) {
+                        Text(bedtimeEstimationTitle)
+                            .font(.title)
+                        Text(bedtimeEstimationMessage)
+                            .font(.largeTitle)
+                    }
+                    .padding(16)
+
                 }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Desired amount of sleep")
-                        .font(.headline)
-                    Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
-
-                }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Daily coffee intake")
-                        .font(.headline)
-                    Stepper("\(coffeeAmount) \(coffeeAmount == 1 ? "cup" : "cups")", value: $coffeeAmount, in: 1...20)
-                }
-
-            }
-            .navigationTitle("BetterRest")
-            .toolbar {
-                Button("Calculate", action: calculateBedtime)
-            }
-            .alert(alertTitle, isPresented: $alertIsShowing) {
-                Button("OK") { }
-            } message: {
-                Text(alertMessage)
+                .navigationTitle("BetterRest")
             }
         }
     }
 
-    func calculateBedtime() {
+    func calculateBedtime() -> Date? {
         do {
             let configuration = MLModelConfiguration()
             let model = try BetterRest(configuration: configuration)
@@ -74,16 +122,10 @@ struct ContentView: View {
                 coffee: Double(coffeeAmount)
             )
 
-            let sleepTime = wakeUp - prediction.actualSleep
-
-            alertTitle = "Your ideal betime is..."
-            alertMessage = sleepTime.formatted(date: .omitted, time: .shortened)
+            return wakeUp - prediction.actualSleep
         } catch {
-            alertTitle = "Error"
-            alertMessage = "Sorry, there was a problem calculating your bedtime."
+            return nil
         }
-
-        alertIsShowing = true
     }
 }
 
