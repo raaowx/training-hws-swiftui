@@ -11,30 +11,50 @@ struct ContentView: View {
     @State private var usedWords = [String]()
     @State private var rootWord = ""
     @State private var newWord = ""
+    @State private var score = 0
 
     @State private var errorTitle = ""
     @State private var errorMessage = ""
     @State private var showingError = false
 
+    private let minLength = 3
+
     var body: some View {
         NavigationView {
             List {
                 Section {
+                    Text("""
+                     Make as many words as possible with the letters in '**\(rootWord)**'.
+
+                     Every word you made adds 10 points. Also, every word adds the same amount of points as letters contains.
+                     """)
+                    .multilineTextAlignment(.center)
+                    HStack {
+                        Text("Your current score is:")
+                        Spacer()
+                        Text("\(score)")
+                            .foregroundColor(score > 0 ? .mint : .black)
+                            .font(.headline)
+                    }
+                }
+                .font(.subheadline)
+
+                Section {
                     TextField("Enter your word", text: $newWord)
                         .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled(true) // <<<- Added by me
+                        .autocorrectionDisabled(true)
                 }
 
                 Section {
                     ForEach(usedWords, id: \.self) { word in
                         HStack {
-                            Image(systemName: "\(word.count).square") // <<<- Customized by me
+                            Image(systemName: "\(word.count).square")
                             Text(word)
                         }
                     }
                 }
             }
-            .navigationTitle(rootWord.uppercased()) // <<<- Added by me
+            .navigationTitle(rootWord.uppercased())
             .onSubmit(addNewWord)
             .onAppear(perform: startGame)
             .alert(errorTitle, isPresented: $showingError) {
@@ -42,13 +62,28 @@ struct ContentView: View {
             } message: {
                 Text(errorMessage)
             }
+            .toolbar {
+                Button(action: startGame, label: {
+                    Text("Restart")
+                    Image(systemName: "restart")
+                })
+                .foregroundColor(.red)
+            }
         }
     }
 
     func addNewWord() {
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
 
-        guard answer.count > 0 else { return }
+        guard isLongEnough(word: answer) else {
+            wordError(title: "Word is not long enough", message: "Please, write at least \(minLength) characters!")
+            return
+        }
+
+        guard isNotRootWord(word: answer) else {
+            wordError(title: "Word can't be the same as the initial one", message: "Don't copy!")
+            return
+        }
 
         guard isOriginal(word: answer) else {
             wordError(title: "Word used already", message: "Be more original!")
@@ -67,8 +102,19 @@ struct ContentView: View {
 
         withAnimation {
             usedWords.insert(answer, at: 0)
+            score += 10
+            score += newWord.count
         }
+
         newWord = ""
+    }
+
+    func isLongEnough(word: String) -> Bool {
+        word.count >= minLength
+    }
+
+    func isNotRootWord(word: String) -> Bool {
+        word != rootWord
     }
 
     func isOriginal(word: String) -> Bool {
@@ -113,7 +159,19 @@ struct ContentView: View {
         }
 
         let allWords = startWords.components(separatedBy: .newlines)
-        rootWord = (allWords.randomElement() ?? "silkworm").trimmingCharacters(in: .whitespacesAndNewlines) // <<<- Added by me
+        rootWord = (allWords.randomElement() ?? "silkworm").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    func resetGame() {
+        usedWords.removeAll()
+        rootWord = ""
+        newWord = ""
+        score = 0
+        errorTitle = ""
+        errorMessage = ""
+        showingError = false
+
+        startGame()
     }
 }
 
