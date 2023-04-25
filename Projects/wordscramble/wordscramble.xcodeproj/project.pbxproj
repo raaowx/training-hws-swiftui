@@ -7,20 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6121480C29F7D19F00B4465E /* start.txt in Resources */ = {isa = PBXBuildFile; fileRef = 6121480B29F7D19F00B4465E /* start.txt */; };
 		617965B929D3272B00AD007F /* WordScrambleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 617965B829D3272B00AD007F /* WordScrambleApp.swift */; };
 		617965BB29D3272B00AD007F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 617965BA29D3272B00AD007F /* ContentView.swift */; };
 		617965BD29D3272C00AD007F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 617965BC29D3272C00AD007F /* Assets.xcassets */; };
 		617965C029D3272C00AD007F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 617965BF29D3272C00AD007F /* Preview Assets.xcassets */; };
-		61A9DFBD29F6B8F400BB54A7 /* start.txt in Resources */ = {isa = PBXBuildFile; fileRef = 61A9DFBC29F6B8F400BB54A7 /* start.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6121480B29F7D19F00B4465E /* start.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = start.txt; sourceTree = "<group>"; };
 		617965B529D3272B00AD007F /* wordscramble.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wordscramble.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		617965B829D3272B00AD007F /* WordScrambleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordScrambleApp.swift; sourceTree = "<group>"; };
 		617965BA29D3272B00AD007F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		617965BC29D3272C00AD007F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		617965BF29D3272C00AD007F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		61A9DFBC29F6B8F400BB54A7 /* start.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = start.txt; path = "../../../../../Temporal/100DOSUI/hackingwithswift/SwiftUI/project5-files/start.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +53,7 @@
 		617965B729D3272B00AD007F /* wordscramble */ = {
 			isa = PBXGroup;
 			children = (
-				61A9DFBC29F6B8F400BB54A7 /* start.txt */,
+				6121480B29F7D19F00B4465E /* start.txt */,
 				617965B829D3272B00AD007F /* WordScrambleApp.swift */,
 				617965BA29D3272B00AD007F /* ContentView.swift */,
 				617965BC29D3272C00AD007F /* Assets.xcassets */,
@@ -129,7 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				617965C029D3272C00AD007F /* Preview Assets.xcassets in Resources */,
-				61A9DFBD29F6B8F400BB54A7 /* start.txt in Resources */,
+				6121480C29F7D19F00B4465E /* start.txt in Resources */,
 				617965BD29D3272C00AD007F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
