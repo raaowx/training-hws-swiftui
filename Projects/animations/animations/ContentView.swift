@@ -8,20 +8,60 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var animationAmount = 0.0
+    @State private var enabled1 = false
+    @State private var enabled2 = false
+    @State private var dragAmount2 = CGSize.zero
+    @State private var isShowingRed3 = false
+
+    private let letters = Array("Hello SwiftUI")
 
     var body: some View {
         VStack {
             Button("Tap Me") {
-                withAnimation(.interpolatingSpring(stiffness: 2, damping: 1)) {
-                    animationAmount += 360
+                enabled1.toggle()
+            }
+            .frame(width: 200, height: 200)
+            .background(enabled1 ? .blue : .red)
+            .animation(nil, value: enabled1)
+            .foregroundColor(.white)
+            .clipShape(RoundedRectangle(cornerRadius: enabled1 ? 60 : 0))
+            .animation(.interpolatingSpring(stiffness: 10, damping: 1), value: enabled1)
+
+
+            HStack(spacing: 0) {
+                ForEach(0..<letters.count, id: \.self) { num in
+                    Text(String(letters[num]))
+                        .padding(5)
+                        .font(.title)
+                        .background(enabled2 ? .blue : .red)
+                        .offset(dragAmount2)
+                        .animation(.default.delay(Double(num) / Double(letters.count)), value: dragAmount2)
                 }
             }
-            .padding(50)
-            .background(.red)
-            .foregroundColor(.white)
-            .clipShape(Circle())
-            .rotation3DEffect(.degrees(animationAmount), axis: (x: 0.5, y: 1, z: 0))
+            .gesture(
+                DragGesture()
+                    .onChanged { dragAmount2 = $0.translation}
+                    .onEnded { _ in
+                        dragAmount2 = .zero
+                        enabled2.toggle()
+                    }
+            )
+
+            Button("Tap Me 2") {
+                withAnimation {
+                    isShowingRed3.toggle()
+                }
+            }
+
+            if isShowingRed3 {
+                Rectangle()
+                    .fill(.red)
+                    .frame(width: 200, height: 200)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading),
+                        removal: .opacity)
+                    )
+            }
         }
     }
 }
