@@ -10,7 +10,6 @@ import SwiftUI
 struct FlagView: View {
     let imageName: String
 
-
     var body: some View {
         Image(imageName)
             .renderingMode(.original)

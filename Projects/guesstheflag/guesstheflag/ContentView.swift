@@ -18,6 +18,10 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var showingFinal = false
 
+    @State private var rotationAngles = [0.0, 0.0, 0.0]
+    @State private var scalePercentage = [1.0, 1.0, 1.0]
+    @State private var blurred = [false, false, false]
+
     var body: some View {
         ZStack {
             RadialGradient(
@@ -59,9 +63,21 @@ struct ContentView: View {
 
                     ForEach(0..<3) { number in
                         Button {
-                            flagTapped(number)
+                            withAnimation {
+                                rotationAngles[number] += 360
+                                for i in 0..<scalePercentage.count {
+                                    guard i != number else { continue }
+                                    scalePercentage[i] = 0.75
+                                    blurred[i] = true
+                                }
+                            }
+
+                            Timer.scheduledTimer(withTimeInterval: 0.75, repeats: false) { _ in flagTapped(number) }
                         } label: {
                             FlagView(imageName: countries[number])
+                                .rotation3DEffect(.degrees(rotationAngles[number]), axis: (x: 0, y: 1, z: 0))
+                                .scaleEffect(scalePercentage[number])
+                                .blur(radius: blurred[number] ? 5 : 0)
                         }
                     }
                 }
@@ -98,7 +114,7 @@ struct ContentView: View {
             scoreAmount += 1
         } else {
             // Add the name of the choosen country with some protection to avoid `indexOutOfBounds`.
-            scoreTitle = "Wrong\(countries.count > number ? "! That's the flag of \(countries[number])" : "")"
+            scoreTitle = "Wrong\(countries.count > number ? "! That's the flag of \(countries[number])" : "!")"
         }
         remainingQuestions -= 1
         showingScore = true
@@ -111,6 +127,12 @@ struct ContentView: View {
         }
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+
+        withAnimation {
+            rotationAngles = [0.0, 0.0, 0.0]
+            scalePercentage = [1.0, 1.0, 1.0]
+            blurred = [false, false, false]
+        }
     }
 
     func reset() {
